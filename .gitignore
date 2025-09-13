@@ -1,0 +1,194 @@
+# ERP Student Management System - .gitignore
+# Government of Rajasthan | Backend Project
+
+# ==========================================
+# Python
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ==========================================
+# Virtual Environment
+# ==========================================
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.python-version
+
+# ==========================================
+# Flask Specific
+# ==========================================
+instance/
+.webassets-cache
+*.db
+*.sqlite
+*.sqlite3
+
+# ==========================================
+# Database Files
+# ==========================================
+*.db
+*.sqlite
+*.sqlite3
+student_erp_dev.db
+student_erp_test.db
+student_erp_prod.db
+
+# ==========================================
+# Logs and Temporary Files
+# ==========================================
+logs/
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+
+# ==========================================
+# Environment Variables & Config
+# ==========================================
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+config.ini
+secrets.json
+
+# ==========================================
+# IDE and Editor Files
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Generated Files
+# ==========================================
+static/receipts/*.pdf
+static/uploads/
+app/static/receipts/
+app/static/uploads/
+temp/
+tmp/
+
+# ==========================================
+# Documentation
+# ==========================================
+docs/_build/
+site/
+
+# ==========================================
+# Security & Credentials
+# ==========================================
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+
+# ==========================================
+# Migration Files (Optional - uncomment if needed)
+# ==========================================
+# migrations/versions/
+# alembic.ini
+
+# ==========================================
+# Testing
+# ==========================================
+.pytest_cache/
+test_*.db
+htmlcov/
+.coverage
+coverage.xml
+
+# ==========================================
+# Package Managers
+# ==========================================
+pip-log.txt
+pip-delete-this-directory.txt
+.pip-cache/
+
+# ==========================================
+# Jupyter Notebook
+# ==========================================
+.ipynb_checkpoints
+
+# ==========================================
+# Node.js (if using frontend build tools)
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# Operating System
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# ==========================================
+# Backup Files
+# ==========================================
+*.backup
+*.bak
+*.tmp
+
+# ==========================================
+# Local Development
+# ==========================================
+local_settings.py
+local_config.py
+
+# ==========================================
+# Redis Dump
+# ==========================================
+dump.rdb
+
+# ==========================================
+# SSL Certificates
+# ==========================================
+*.crt
+*.key
+*.pem
+*.p12
+*.pfx

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admission Approved</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .celebration {
+        font-size: 48px;
+        margin: 10px 0;
+      }
+      .content {
+        padding: 30px;
+      }
+      .greeting {
+        font-size: 18px;
+        color: #28a745;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+      .success-box {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .success-title {
+        font-size: 24px;
+        color: #155724;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .roll-number {
+        font-size: 18px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        color: #28a745;
+        font-weight: bold;
+        display: inline-block;
+        margin: 10px 0;
+        border: 2px solid #28a745;
+      }
+      .details-section {
+        margin: 25px 0;
+      }
+      .details-section h3 {
+        color: #ff6b35;
+        border-bottom: 2px solid #ffe0b2;
+        padding-bottom: 8px;
+      }
+      .details-grid {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        padding: 8px 0;
+        border-bottom: 1px dotted #dee2e6;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .next-steps {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+      }
+      .next-steps h4 {
+        color: #856404;
+        margin-top: 0;
+      }
+      .step-list {
+        counter-reset: step-counter;
+        list-style: none;
+        padding: 0;
+      }
+      .step-list li {
+        counter-increment: step-counter;
+        margin: 12px 0;
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+        position: relative;
+        padding-left: 50px;
+      }
+      .step-list li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #ff6b35;
+        color: white;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .footer {
+        background: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        border-top: 1px solid #dee2e6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="celebration">🎉</div>
+        <h1>Congratulations!</h1>
+        <p>Your admission has been approved</p>
+      </div>
+
+      <div class="content">
+        <div class="greeting">Dear {{ student_name }},</div>
+
+        <div class="success-box">
+          <div class="success-title">ADMISSION APPROVED!</div>
+          <p>Welcome to {{ college_name }}</p>
+          <div class="roll-number">Roll Number: {{ roll_no }}</div>
+        </div>
+
+        <p>
+          We are delighted to inform you that your application for admission has
+          been <strong>successfully approved</strong>! You are now officially
+          part of our institution's academic community.
+        </p>
+
+        <div class="details-section">
+          <h3>📋 Admission Details</h3>
+          <div class="details-grid">
+            <div class="detail-row">
+              <span><strong>Application ID:</strong></span>
+              <span>{{ application_id }}</span>
+            </div>
+            <div class="detail-row">
+              <span><strong>Roll Number:</strong></span>
+              <span>{{ roll_no }}</span>
+            </div>
+            <div class="detail-row">
+              <span><strong>Course:</strong></span>
+              <span>{{ course_name }}</span>
+            </div>
+            <div class="detail-row">
+              <span><strong>Approval Date:</strong></span>
+              <span>{{ update_date }}</span>
+            </div>
+            <div class="detail-row">
+              <span><strong>Academic Year:</strong></span>
+              <span>2025-26</span>
+            </div>
+          </div>
+        </div>
+
+        {% if remarks %}
+        <div class="details-section">
+          <h3>📝 Additional Information</h3>
+          <div class="details-grid">
+            <p>{{ remarks }}</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <div class="next-steps">
+          <h4>🎯 Next Steps to Complete Your Admission:</h4>
+          <ol class="step-list">
+            <li>
+              <strong>Document Verification:</strong> Visit the admission office
+              with original documents for verification within 7 days.
+            </li>
+            <li>
+              <strong>Fee Payment:</strong> Complete the semester fee payment
+              before the due date to secure your seat.
+            </li>
+            <li>
+              <strong>Hostel Application:</strong> Apply for hostel
+              accommodation if required (subject to availability).
+            </li>
+            <li>
+              <strong>Medical Check-up:</strong> Complete the mandatory medical
+              examination at the college dispensary.
+            </li>
+            <li>
+              <strong>Orientation Program:</strong> Attend the mandatory
+              orientation program for new students.
+            </li>
+            <li>
+              <strong>ID Card & Library Card:</strong> Collect your student ID
+              card and library membership card from respective offices.
+            </li>
+          </ol>
+        </div>
+
+        <div class="details-section">
+          <h3>📞 Important Contact Information</h3>
+          <div class="details-grid">
+            <div class="detail-row">
+              <span><strong>Admission Office:</strong></span>
+              <span>+91-141-XXXXXXX</span>
+            </div>
+            <div class="detail-row">
+              <span><strong>Accounts Office:</strong></span>
+              <span>accounts@dtegov.raj.in</span>
+            </div>
+            <div class="detail-row">
+              <span><strong>Office Hours:</strong></span>
+              <span>9:00 AM - 5:00 PM (Mon-Fri)</span>
+            </div>
+          </div>
+        </div>
+
+        <p
+          style="
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f5e8;
+            border-radius: 8px;
+            text-align: center;
+          ">
+          <strong>Welcome to the Government Technical College family!</strong
+          ><br />
+          We look forward to supporting you throughout your academic journey.
+        </p>
+
+        <p style="margin-top: 30px">
+          Best regards,<br />
+          <strong>Admission Committee</strong><br />
+          {{ college_name }}
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>
+          <strong
+            >Government of Rajasthan | Directorate of Technical
+            Education</strong
+          >
+        </p>
+        <p>This is an automated email. Please do not reply to this message.</p>
+      </div>
+    </div>
+  </body>
+</html>

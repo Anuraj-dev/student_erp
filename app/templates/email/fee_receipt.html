@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Receipt</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .success-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+      .content {
+        padding: 30px;
+      }
+      .greeting {
+        font-size: 18px;
+        color: #28a745;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+      .receipt-box {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        border: 2px solid #28a745;
+        border-radius: 10px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .receipt-title {
+        font-size: 20px;
+        color: #155724;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+      .amount-paid {
+        font-size: 32px;
+        color: #155724;
+        font-weight: bold;
+        margin: 15px 0;
+      }
+      .transaction-id {
+        font-size: 16px;
+        background: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        color: #28a745;
+        font-weight: bold;
+        display: inline-block;
+        margin: 10px 0;
+        border: 2px solid #28a745;
+        letter-spacing: 1px;
+      }
+      .payment-details {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 8px;
+        border-left: 4px solid #28a745;
+        margin: 25px 0;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 12px 0;
+        padding: 10px 0;
+        border-bottom: 1px dotted #dee2e6;
+      }
+      .detail-row:last-child {
+        border-bottom: none;
+      }
+      .detail-label {
+        font-weight: 600;
+        color: #495057;
+      }
+      .detail-value {
+        color: #28a745;
+        font-weight: 500;
+      }
+      .attachment-notice {
+        background: #cce5ff;
+        border: 1px solid #90caf9;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+        text-align: center;
+      }
+      .attachment-notice h4 {
+        color: #1976d2;
+        margin-top: 0;
+      }
+      .important-note {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .important-note h4 {
+        color: #856404;
+        margin-top: 0;
+      }
+      .contact-info {
+        background: #e8f5e8;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+      }
+      .contact-info h4 {
+        color: #155724;
+        margin-top: 0;
+      }
+      .footer {
+        background: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        border-top: 1px solid #dee2e6;
+      }
+      .print-button {
+        background: #4a90e2;
+        color: white;
+        padding: 12px 25px;
+        border-radius: 20px;
+        text-decoration: none;
+        font-weight: bold;
+        display: inline-block;
+        margin: 15px 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="success-icon">✅</div>
+        <h1>Payment Successful</h1>
+        <p>{{ college_name }}</p>
+      </div>
+
+      <div class="content">
+        <div class="greeting">Dear {{ student_name }},</div>
+
+        <p>
+          Thank you for your payment! Your transaction has been processed
+          successfully. This email serves as confirmation of your payment.
+        </p>
+
+        <div class="receipt-box">
+          <div class="receipt-title">PAYMENT RECEIPT</div>
+          <div class="amount-paid">₹{{ amount_paid }}</div>
+          <div class="transaction-id">{{ transaction_id }}</div>
+          <div style="font-size: 14px; color: #666; margin-top: 10px">
+            {{ payment_date }}
+          </div>
+        </div>
+
+        <div class="payment-details">
+          <h4 style="margin-top: 0; color: #333">📋 Payment Details</h4>
+          <div class="detail-row">
+            <span class="detail-label">Student Name:</span>
+            <span class="detail-value">{{ student_name }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Roll Number:</span>
+            <span class="detail-value">{{ roll_no }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Transaction ID:</span>
+            <span class="detail-value">{{ transaction_id }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Amount Paid:</span>
+            <span class="detail-value">₹{{ amount_paid }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Payment Date:</span>
+            <span class="detail-value">{{ payment_date }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Payment Status:</span>
+            <span class="detail-value">✅ SUCCESS</span>
+          </div>
+        </div>
+
+        <div class="attachment-notice">
+          <h4>📎 Official Receipt Attached</h4>
+          <p>
+            Your official payment receipt has been attached to this email in PDF
+            format.
+          </p>
+          <p>
+            This receipt contains all the necessary details and can be used for
+            official purposes.
+          </p>
+          <div style="margin-top: 15px">
+            <strong>📄 Filename:</strong> Fee_Receipt_{{ transaction_id }}.pdf
+          </div>
+        </div>
+
+        <div class="important-note">
+          <h4>⚠️ Important Instructions</h4>
+          <ul style="margin: 10px 0; padding-left: 20px">
+            <li>
+              <strong>Save this receipt:</strong> Keep both this email and the
+              PDF attachment for your records
+            </li>
+            <li>
+              <strong>Official proof:</strong> This receipt is valid for all
+              official and academic purposes
+            </li>
+            <li>
+              <strong>Future reference:</strong> You may need this receipt for
+              examination registration, document verification, or other academic
+              processes
+            </li>
+            <li>
+              <strong>Print copy:</strong> We recommend printing a copy for your
+              physical records
+            </li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin: 25px 0">
+          <a
+            href="#"
+            onclick="window.print(); return false;"
+            class="print-button"
+            >🖨️ Print This Receipt</a
+          >
+        </div>
+
+        <div class="contact-info">
+          <h4>📞 Need Help or Have Questions?</h4>
+          <div class="detail-row">
+            <span class="detail-label">Accounts Office:</span>
+            <span class="detail-value">accounts@dtegov.raj.in</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phone Support:</span>
+            <span class="detail-value">+91-141-XXXXXXX</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Office Hours:</span>
+            <span class="detail-value"
+              >9:00 AM - 5:00 PM (Monday to Friday)</span
+            >
+          </div>
+          <p style="margin-top: 15px; margin-bottom: 0; font-size: 14px">
+            <em
+              >When contacting us, please mention your Transaction ID:
+              <strong>{{ transaction_id }}</strong></em
+            >
+          </p>
+        </div>
+
+        <div
+          style="
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            text-align: center;
+          ">
+          <h4 style="color: #1976d2; margin-top: 0">🎓 What's Next?</h4>
+          <p style="margin: 0">
+            Your payment has been recorded in our system. You can now proceed
+            with:
+          </p>
+          <ul style="text-align: left; margin: 10px 0; display: inline-block">
+            <li>Examination registration (if applicable)</li>
+            <li>Library and lab access</li>
+            <li>Hostel accommodation (if applied)</li>
+            <li>Academic activities and programs</li>
+          </ul>
+        </div>
+
+        <p style="margin-top: 30px">
+          Thank you for your prompt payment and for being part of our
+          institution!<br /><br />
+          Best regards,<br />
+          <strong>Accounts Office</strong><br />
+          {{ college_name }}
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>
+          <strong
+            >Government of Rajasthan | Directorate of Technical
+            Education</strong
+          >
+        </p>
+        <p>
+          This is an automated receipt. Please save this email for your records.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

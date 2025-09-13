@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admission Confirmation</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background: linear-gradient(135deg, #4a90e2, #ff6b35);
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .header p {
+        margin: 5px 0 0 0;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+      .content {
+        padding: 30px;
+      }
+      .greeting {
+        font-size: 18px;
+        color: #4a90e2;
+        margin-bottom: 20px;
+      }
+      .application-box {
+        background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+        border: 2px solid #4a90e2;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .application-id {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1976d2;
+        letter-spacing: 1px;
+      }
+      .info-section {
+        margin: 25px 0;
+      }
+      .info-section h3 {
+        color: #ff6b35;
+        border-bottom: 2px solid #ffe0b2;
+        padding-bottom: 8px;
+      }
+      .info-list {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 4px solid #4a90e2;
+      }
+      .info-list ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      .info-list li {
+        margin: 8px 0;
+      }
+      .status-url {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 5px;
+        padding: 15px;
+        text-align: center;
+        margin: 20px 0;
+      }
+      .status-url a {
+        color: #856404;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .footer {
+        background: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+        border-top: 1px solid #dee2e6;
+      }
+      .logo-section {
+        text-align: center;
+        margin: 20px 0;
+      }
+      .contact-info {
+        margin-top: 15px;
+        font-size: 11px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>{{ college_name }}</h1>
+        <p>Directorate of Technical Education, Government of Rajasthan</p>
+      </div>
+
+      <div class="content">
+        <div class="greeting">Dear {{ student_name }},</div>
+
+        <p>
+          Thank you for your interest in our institution! Your admission
+          application has been successfully submitted and is currently under
+          review.
+        </p>
+
+        <div class="application-box">
+          <p style="margin: 0; font-size: 16px; color: #666">
+            Your Application ID
+          </p>
+          <div class="application-id">{{ application_id }}</div>
+          <p style="margin: 10px 0 0 0; font-size: 14px; color: #666">
+            Keep this ID safe for future reference
+          </p>
+        </div>
+
+        <div class="info-section">
+          <h3>📝 Application Details</h3>
+          <div class="info-list">
+            <ul>
+              <li><strong>Course Applied:</strong> {{ course_name }}</li>
+              <li><strong>Application Date:</strong> {{ application_date }}</li>
+              <li><strong>Application Status:</strong> Under Review</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h3>⚠️ Important Information</h3>
+          <div class="info-list">
+            <ul>
+              <li>
+                Your application is being reviewed by our admission committee
+              </li>
+              <li>
+                You will receive email updates about your application status
+              </li>
+              <li>
+                Keep your Application ID handy for all future correspondence
+              </li>
+              <li>Ensure all required documents are submitted</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="status-url">
+          <p>
+            <strong>📊 Track Your Application Status:</strong><br />
+            <a href="{{ status_check_url }}"
+              >Click here to check your application status</a
+            >
+          </p>
+        </div>
+
+        <div class="info-section">
+          <h3>📄 Required Documents Checklist</h3>
+          <div class="info-list">
+            <ul>
+              <li>10th Standard Mark Sheet & Certificate</li>
+              <li>12th Standard Mark Sheet & Certificate</li>
+              <li>Transfer Certificate from Previous Institution</li>
+              <li>Aadhaar Card (Copy)</li>
+              <li>Passport Size Photographs (4 copies)</li>
+              <li>Caste Certificate (if applicable)</li>
+              <li>Income Certificate (if applicable)</li>
+            </ul>
+          </div>
+        </div>
+
+        <p>
+          For any queries regarding your application, please contact our
+          admission office and quote your Application ID.
+        </p>
+
+        <p style="margin-top: 30px">
+          Best regards,<br />
+          <strong>Admission Office</strong><br />
+          {{ college_name }}
+        </p>
+      </div>
+
+      <div class="footer">
+        <div class="logo-section">
+          <strong
+            >Government of Rajasthan | Directorate of Technical
+            Education</strong
+          >
+        </div>
+        <p>This is an automated email. Please do not reply to this message.</p>
+        <div class="contact-info">
+          <p>For support: admissions@dtegov.raj.in | Phone: +91-141-XXXXXXX</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
