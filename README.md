@@ -1,369 +1,99 @@
-# 🎓 ERP Student Management System
+<h1 align="center">Student ERP</h1>
 
-**Government of Rajasthan | Educational Management Platform**
+<p align="center">
+  A Flask backend for a college's admissions, fees, hostel and library.<br />
+  Every module is a JSON API, and staff see live numbers on a dashboard.
+</p>
 
-[![Python](https://img.shields.io/badge/Python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com/)
-[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0+-orange.svg)](https://www.sqlalchemy.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+Student ERP takes a student from application to enrollment. An applicant posts to the admission API and gets an application ID. Staff review the application and approve it. The approval creates the student with a roll number built from the admission year, the course code and a four-digit serial, then emails the applicant. From there an admin bills the student's fees for a semester, the hostel allocates a room, and the library issues books. Each step is an endpoint.
 
-A comprehensive Enterprise Resource Planning (ERP) system designed specifically for educational institutions under the Government of Rajasthan. This backend system provides robust APIs and services for managing all aspects of student lifecycle from admission to graduation.
+This repo is the backend only. There is no frontend, so you call the API from an HTTP client or your own app. It runs on Flask and SQLAlchemy and uses SQLite until you point it at another database. Redis is optional. Emails need an SMTP account.
 
-## 🏛️ Government of Rajasthan Integration
+## What you get
 
-This system is designed to comply with Government of Rajasthan standards and includes:
+- **Applications become student records.** `POST /api/admission/apply` returns an `application_id`. A staff member moves it to `under_review`, `approved`, `declined` or `waitlisted`. An approval creates the `Student` row with a generated roll number and sends the applicant an email.
+- **Fees are billed by semester and paid as PDFs.** An admin posts a semester from 1 to 8, an academic year and a list of course IDs to `/api/fee/generate-demand`. Each fee is due 30 days out unless you pass `due_days`. A payment produces a PDF receipt with a QR code, and anyone with the receipt number can download it from `/api/fee/receipt-download/<receipt_number>`.
+- **Library loans have hard limits.** A student can hold five books at once and cannot take another while a book is overdue. A renewal adds 14 days unless the request says otherwise.
+- **Routes check the token and the role.** Login returns an access token that lasts 24 hours and a refresh token that lasts 30 days. Admin and staff routes check the role after the token is verified. Other routes need a valid token. Login, applying, the application status lookup, the receipt download, the health checks and the two dashboard charts need no token.
+- **Student changes leave an audit trail.** Creating, updating, deactivating or bulk-changing a student writes a line to `logs/admin_actions.log`.
+- **Failed emails are retried in the background.** Sends run on their own threads. A failed send goes to a queue and is retried up to three times, after 60, 120 and 180 seconds.
+- **The dashboard updates over Socket.IO.** Clients connect to the `/dashboard` namespace with a JWT in the connection payload and join a room for their role. Admission decisions and payments push updates to connected dashboards. A client can send `request_stats` to get the current counts.
+- **Requests are rate limited and filtered.** Each IP gets 100 requests a minute, or 10 every five minutes on auth routes. Over the limit, the API returns 429. Requests whose input matches SQL keywords or script patterns get a 400. Responses carry a Content-Security-Policy and `X-Frame-Options: DENY`. Counters live in each process's memory, so two worker processes count separately.
 
-- 🏢 Official government branding and themes
-- 📄 Government-compliant document generation
-- 🔐 Security standards meeting government requirements
-- 📊 Reporting formats as per educational department guidelines
+## Running it
 
-## ✨ Features
+The code runs on Python 3.12. Pillow 10.0.1, pinned in `requirements.txt`, does not build on Python 3.14, so `pip install` fails there.
 
-### 🔐 Core System Features
-
-- **Authentication & Authorization**: JWT-based secure login with role-based access control
-- **Student Management**: Complete student lifecycle management from admission to graduation
-- **Academic Management**: Course structure, subjects, departments, and academic calendar
-- **Fee Management**: Automated fee calculation, payment processing, and receipt generation
-- **Hostel Management**: Room allocation, occupancy tracking, and management
-- **Library Management**: Book issue/return system with fine calculation
-- **Examination System**: Exam scheduling, result management, and transcript generation
-
-### 🤖 Automated Services
-
-- **PDF Generation**: Professional government-themed documents with QR verification
-- **Email Notifications**: Automated email system with HTML templates
-- **Real-time Dashboard**: Live analytics and reporting with WebSocket integration
-- **Security Middleware**: Input validation, SQL injection prevention, and audit logging
-
-### 📄 Document Generation
-
-- 🧾 **Fee Receipts**: Professional receipts with QR codes
-- 📜 **Admission Letters**: Official admission documents
-- 🆔 **Student ID Cards**: Photo ID cards with QR verification
-- 📋 **Academic Transcripts**: Secure academic records
-
-## 🏗️ Architecture
-
-```
-student_erp/
-├── app/                          # Main application package
-│   ├── models/                   # Database models (SQLAlchemy)
-│   ├── routes/                   # API endpoints (Flask Blueprints)
-│   ├── utils/                    # Utility services (PDF, Email, Security)
-│   ├── templates/               # Email templates
-│   └── static/                  # Static files and generated documents
-├── tests/                       # Comprehensive test suite
-├── logs/                        # Application logs
-├── instance/                    # Database and instance files
-└── migrations/                  # Database migrations
+```sh
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python run.py
 ```
 
-## 🚀 Quick Start
+The app creates its tables on startup. In development it also creates `instance/student_erp_dev.db` and a `logs/` folder in the working directory. It listens on port 5000. Set `PORT` to change that.
 
-### Prerequisites
+Run it from a terminal. Flask-SocketIO refuses to start its Werkzeug server when stdin is not a terminal, so a systemd unit or a container exits at startup. This repo has no WSGI server setup, so you add one yourself.
 
-- Python 3.13+
-- pip package manager
-- SQLite (for development)
-- Redis (for production - optional)
+Check that it is up:
 
-### Installation
+```sh
+curl http://localhost:5000/api/auth/health
+```
 
-1. **Clone the repository**
+The app does not read `.env` files. Export the variables in your shell. `.env.example` names several variables the code never reads, so use the table below.
 
-   ```bash
-   git clone https://github.com/yourusername/erp-student-management.git
-   cd erp-student-management
-   ```
+## Configuration
 
-2. **Create virtual environment**
+| Variable | Default | What it sets |
+| --- | --- | --- |
+| `FLASK_ENV` | `development` | Config to load: `development`, `testing` or `production`. `run.py` turns on debug mode when it is `development`. |
+| `PORT` | `5000` | Port `run.py` listens on. |
+| `SECRET_KEY` | `dev-secret-key-change-in-production` | Flask secret key. |
+| `JWT_SECRET_KEY` | `jwt-secret-string` | Signs JWT tokens. |
+| `DEV_DATABASE_URL` | `sqlite:///student_erp_dev.db` | Database in development. |
+| `DATABASE_URL` | `sqlite:///student_erp.db` | Database in production. The production default is a MySQL URL, and `requirements.txt` has no MySQL driver. |
+| `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB` | `localhost`, `6379`, `0` | Redis connection. The app pings it at startup and runs without it. |
+| `ALLOWED_ORIGINS` | `*` | Comma-separated CORS origins. |
+| `MAIL_SERVER`, `MAIL_PORT` | `smtp.gmail.com`, `587` | SMTP host and port. |
+| `MAIL_USE_TLS` | `true` | Use TLS for the SMTP connection. |
+| `MAIL_USERNAME`, `MAIL_PASSWORD` | none | SMTP login. |
+| `MAIL_DEFAULT_SENDER` | none | From address. Sends fail without it. |
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+The defaults for `SECRET_KEY` and `JWT_SECRET_KEY` are placeholders from the source. Set both before you run the app anywhere other people can reach.
 
-3. **Install dependencies**
+The fee receipt header prints "Government Engineering College", a string hardcoded in `app/routes/fee.py`. Change it before you issue receipts for another institution.
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+## API
 
-4. **Set up environment variables**
+| Prefix | Module | Covers |
+| --- | --- | --- |
+| `/api/auth` | `app/routes/auth.py` | Login, refresh, logout, profile, password change, token check. |
+| `/api/student` | `app/routes/student.py` | Create, read, update and deactivate students, search, statistics, academic record, fee and library history, bulk operations. |
+| `/api/admission` | `app/routes/admission.py` | Apply, list applications, process, status lookup, statistics. |
+| `/api/fee` | `app/routes/fee.py` | Fee demands, payments, pending fees, receipts, reports, statistics. |
+| `/api/hostel` | `app/routes/hostel.py` | Available rooms, allocate, vacate, occupancy report, student lookup, statistics. |
+| `/api/library` | `app/routes/library.py` | Books, issue, return, renew, overdue, search, categories, statistics. |
+| `/api/dashboard` | `app/routes/dashboard.py` | Summary, enrollment and fee charts, and the Socket.IO namespace `/dashboard`. |
 
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+The Swagger UI runs at `/api/v1/docs/`, but its paths do not match the routes above. It lists `/fees/structure`, for example, and no route with that path exists. Use this table.
 
-5. **Initialize database**
+## Testing
 
-   ```bash
-   python run.py
-   ```
+Run the suite from the repo root:
 
-6. **Access the application**
-   ```
-   http://localhost:5000
-   ```
-
-## 🧪 Testing
-
-We provide comprehensive testing suite covering all backend functionality:
-
-### Run All Tests
-
-```bash
-# Using test suite manager
-python tests/test_suite.py --run-all
-
-# Using shell script
-./tests/run_tests.sh
-
-# Using pytest
+```sh
 pytest
 ```
 
-### Run Specific Tests
+`tests/test_final_backend_verification.py` imports `requests`, which `requirements.txt` does not install, so pytest stops at collection. Skip that file to run the rest:
 
-```bash
-# Test specific component
-python tests/test_models.py
-python tests/test_auth.py
-python tests/test_automated_services.py
-
-# Main backend verification
-python tests/test_comprehensive_backend.py
-
-# Simple functionality test
-python tests/simple_backend_test.py
+```sh
+pytest --ignore=tests/test_final_backend_verification.py
 ```
 
-### Test Coverage
+At the time of this rewrite, that command reported 117 passed, 18 failed, 2 errors and 4 skipped. The failures are in `tests/test_fee_management.py` and `tests/test_data_security_validation.py`.
 
-- ✅ **100%** Backend task coverage (Tasks 1-10)
-- ✅ **Authentication & Security** testing
-- ✅ **Database Models** validation
-- ✅ **API Endpoints** verification
-- ✅ **PDF & Email Services** testing
-- ✅ **Integration** testing
+## License
 
-## 📊 API Documentation
-
-### Authentication
-
-```http
-POST /api/auth/login
-POST /api/auth/logout
-POST /api/auth/refresh
-```
-
-### Student Management
-
-```http
-GET    /api/students
-POST   /api/students
-PUT    /api/students/<id>
-DELETE /api/students/<id>
-```
-
-### Admission Management
-
-```http
-POST /api/admission/apply
-GET  /api/admission/applications
-PUT  /api/admission/process/<id>
-```
-
-### Fee Management
-
-```http
-POST /api/fee/generate-demand
-POST /api/fee/pay
-GET  /api/fee/receipt/<id>
-```
-
-### Dashboard & Analytics
-
-```http
-GET /api/dashboard/summary
-GET /api/dashboard/charts/enrollment
-GET /api/dashboard/real-time/stats
-```
-
-_For complete API documentation, see the [API Documentation](docs/api.md)_
-
-## 🔧 Configuration
-
-### Environment Variables
-
-```bash
-FLASK_ENV=development
-SECRET_KEY=your-secret-key
-JWT_SECRET_KEY=your-jwt-secret
-SQLALCHEMY_DATABASE_URI=sqlite:///student_erp.db
-MAIL_SERVER=smtp.gmail.com
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-```
-
-### Database Configuration
-
-The system uses SQLAlchemy ORM with support for:
-
-- SQLite (development)
-- PostgreSQL (recommended for production)
-- MySQL (alternative for production)
-
-## 🏃‍♂️ Development
-
-### Project Structure
-
-- **Models**: SQLAlchemy models in `app/models/`
-- **Routes**: Flask blueprints in `app/routes/`
-- **Services**: Utility services in `app/utils/`
-- **Tests**: Comprehensive test suite in `tests/`
-
-### Adding New Features
-
-1. Create model in `app/models/`
-2. Create routes in `app/routes/`
-3. Add tests in `tests/`
-4. Update documentation
-
-### Code Style
-
-- Follow PEP 8 guidelines
-- Use type hints where applicable
-- Maintain test coverage above 90%
-
-## 🔐 Security
-
-### Implemented Security Measures
-
-- 🔑 JWT authentication with role-based access control
-- 🛡️ Input validation and sanitization
-- 🚫 SQL injection prevention
-- 🔒 XSS protection
-- 📝 Comprehensive audit logging
-- 🔐 Password hashing (Werkzeug)
-- 🌐 CORS configuration
-- ⏱️ Rate limiting (Redis-based)
-
-### Security Best Practices
-
-- Regular security audits
-- Dependency vulnerability scanning
-- Secure coding practices
-- Regular password policy enforcement
-
-## 📈 Monitoring & Logging
-
-### Logging Categories
-
-- **System Logs**: Application startup and configuration
-- **Security Logs**: Authentication attempts and security events
-- **Admin Logs**: Administrative actions and changes
-- **Performance Logs**: Response times and system performance
-- **Error Logs**: Application errors and exceptions
-
-### Log Files
-
-```
-logs/
-├── student_erp.log          # Main application log
-├── security.log             # Security-related events
-├── admin_actions.log        # Administrative activities
-├── errors.log               # Error tracking
-└── performance.log          # Performance monitoring
-```
-
-## 🚀 Deployment
-
-### Production Deployment
-
-1. Set up production database (PostgreSQL recommended)
-2. Configure environment variables
-3. Set up reverse proxy (Nginx)
-4. Use WSGI server (Gunicorn)
-5. Set up SSL certificates
-6. Configure monitoring and logging
-
-### Docker Deployment
-
-```bash
-# Build image
-docker build -t erp-student-management .
-
-# Run container
-docker run -d -p 5000:5000 erp-student-management
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-
-- Write tests for new features
-- Follow existing code style
-- Update documentation
-- Ensure all tests pass
-
-## 📞 Support
-
-### Technical Support
-
-- **Email**: support@rajasthan.gov.in
-- **Documentation**: [Wiki Pages](wiki/)
-- **Issues**: [GitHub Issues](issues/)
-
-### Government Contact
-
-- **Department**: Education Department, Government of Rajasthan
-- **Portal**: [Rajasthan Education Portal](https://education.rajasthan.gov.in)
-
-## 📋 Changelog
-
-### Version 1.0.0 (Current)
-
-- ✅ Complete backend implementation (Tasks 1-10)
-- ✅ Authentication and authorization system
-- ✅ Student management functionality
-- ✅ Fee management with PDF receipts
-- ✅ Automated email notifications
-- ✅ Comprehensive testing suite
-- ✅ Security implementations
-- ✅ API documentation
-
-### Upcoming Features
-
-- [ ] Frontend React/Vue.js interface
-- [ ] Mobile application
-- [ ] Advanced reporting dashboard
-- [ ] Integration with government databases
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🏛️ Government Compliance
-
-This system is developed in compliance with:
-
-- Government of Rajasthan IT policies
-- Educational department guidelines
-- Data protection regulations
-- Security standards for government applications
-
----
-
-**Developed with ❤️ for Government of Rajasthan Education Department**
-
-_For technical queries, please contact the development team or raise an issue in this repository._
+Released under the [MIT License](LICENSE).
